@@ -7,13 +7,13 @@ const casesTypeColors = {
     hex: "#CC1034",
     rgb: "rgb(204, 16, 52)",
     half_op: "rgba(204, 16, 52, 0.5)",
-    multiplier: 800,
+    multiplier: 300,
   },
   recovered: {
     hex: "#7dd71d",
     rgb: "rgb(125, 215, 29)",
     half_op: "rgba(125, 215, 29, 0.5)",
-    multiplier: 1200,
+    multiplier: 375,
   },
   deaths: {
     hex: "#fb4443",
@@ -69,3 +69,16 @@ export const showDataOnMap = (data, casesType = "cases") =>
       </Popup>
     </Circle>
   ));
+
+
+export function getCurrentDate(separator = '') {
+
+  let newDate = new Date()
+  let date = (newDate.getDate() - 1).toString();
+  let month = (newDate.getMonth() + 1).toString();
+  let year = newDate.getFullYear().toString().slice(-2);
+
+  let today = month + "/" + date + "/" + year;
+
+  return today;
+}

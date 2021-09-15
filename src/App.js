@@ -6,6 +6,11 @@ import {
   Select,
   Card,
   CardContent,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton
 } from "@material-ui/core";
 import InfoBox from "./InfoBox";
 import LineGraph from "./LineGraph";
@@ -14,6 +19,8 @@ import { sortData, prettyPrintStat } from "./util";
 import numeral from "numeral";
 import Map from "./Map";
 import "leaflet/dist/leaflet.css";
+import MenuIcon from "@material-ui/icons/Menu";
+import { BrowserRouter as Router, Link } from 'react-router-dom';
 
 const App = () => {
   const [country, setInputCountry] = useState("worldwide");
@@ -24,6 +31,8 @@ const App = () => {
   const [casesType, setCasesType] = useState("cases");
   const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
   const [mapZoom, setMapZoom] = useState(3);
+  const [countryVaccineStat, setcountryVaccineStat] = useState([]);
+  // const [loader, setloader] = useState(false);
 
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
@@ -49,10 +58,24 @@ const App = () => {
         });
     };
 
+    const vaccineData = async () => {
+
+      const url = "https://disease.sh/v3/covid-19/vaccine/coverage/countries?lastdays=1";
+
+      await fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          // console.log("DATA", data);
+          setcountryVaccineStat(data);
+        });
+    };
+
     getCountriesData();
+    vaccineData();
   }, []);
 
-  console.log(casesType);
+  // console.log(casesType);
+  // console.log(countryVaccineStat);
 
   const onCountryChange = async (e) => {
     const countryCode = e.target.value;
@@ -74,6 +97,29 @@ const App = () => {
   return (
     <div className="app">
       <div className="app__left">
+
+        <AppBar position="static" style={{ marginBottom: '8px' }}>
+          <Toolbar>
+            <IconButton edge="start" color="inherit" aria-label="menu">
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6">
+              Home
+            </Typography>
+            {console.log("PRANAV", countries)}
+            {console.log(countryVaccineStat)}
+            {countries.length > 0 && <Link to={{
+              pathname: "/vaccinestat",
+              vaccineProps: {
+                countries: { countries },
+                countryVaccineStat: { countryVaccineStat }
+              }
+            }} style={{ marginLeft: '10px', color: "white" }}>
+              <Button color="inherit" style={{ color: "white" }}>Vaccine stat</Button>
+            </Link>}
+          </Toolbar>
+        </AppBar>
+
         <div className="app__header">
           <h1>COVID-19 Tracker</h1>
           <FormControl className="app__dropdown">
@@ -126,7 +172,7 @@ const App = () => {
           <div className="app__information">
             <h3>Live Cases by Country</h3>
             <Table countries={tableData} />
-            <h3>Worldwide new {casesType}</h3>
+            <h3>Worldwide {casesType}</h3>
             <LineGraph casesType={casesType} />
           </div>
         </CardContent>
